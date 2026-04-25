@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="search-section">
+    <div class="search-wrapper">
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Milyen ételt keresel?" class="main-search">
+      <button class="btn-search">Keresés</button>
+      <button class="btn-filter" (click)="toggleSzuro()">
+        {{ szuroNyitva ? 'Bezárás' : 'Szűrés' }} ⚙️
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-panel" [class.show]="szuroNyitva">
+    <p style="text-align: center; color: #666;">A részletes szűrők a Java adatbázis bővítése után fognak működni.</p>
+  </div>
+
+  <div class="recipe-grid">
+    <div class="recipe-card" *ngFor="let recipe of filteredRecipes" (click)="kivalasztottRecept = recipe">
+      <div class="card-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; height: 180px; font-size: 50px;">
+        🍳
+      </div>
+    <div class="card-content">
+  <span class="badge">{{recipe.kategoria}}</span>
+  <h3>{{recipe.title}}</h3>
+  
+  <div class="recipe-stats">
+    <div class="stat">
+      <small>NEHÉZSÉG</small>
+      <div class="stat-value">{{recipe.nehezseg}}</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <small>ELKÉSZÍTÉSI IDŐ</small>
+      <div class="stat-value">{{recipe.ido}} perc</div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal-overlay" *ngIf="kivalasztottRecept" (click)="kivalasztottRecept = null">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="kivalasztottRecept = null">&times;</button>
+      <div class="modal-body">
+        <h2>{{kivalasztottRecept.title}}</h2>
+        <p><strong>Szerző:</strong> {{kivalasztottRecept.author}}</p>
+        <hr>
+        <h3>Elkészítés:</h3>
+        <p style="white-space: pre-wrap;">{{kivalasztottRecept.description}}</p>
+      </div>
+    </div>
+  </div>
+</div>
