@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -12,21 +12,35 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RecipeListComponent implements OnInit { 
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
 
   searchTerm: string = '';
   szuroNyitva: boolean = false;
   kivalasztottRecept: any = null;
 
-  // Ide mentjük majd a Java-ból érkező recepteket
+  bejelentkezve: boolean = false;
+  bejelentkezoAblakNyitva: boolean = false;
+  kotelezoBejelentkezes: boolean = false; 
+  loginAdatok = { email: '', jelszo: '' };
+
+  urlapNyitva: boolean = false;
+  ujReceptAdatok = {
+    title: '',
+    description: '',
+    author: '',
+    ido: 0,
+    nehezseg: 'Könnyű',
+    kategoria: '',
+    kepUrl: ''
+  };
+
   recipes: any[] = [];
 
-  // Ez a függvény fut le automatikusan, amikor megnyitom az oldalt
   ngOnInit() {
     this.betoltes();
   }
 
   betoltes() {
-    // Meghívom a Java végpontot (amit IntelliJ-ben írtam)
     this.http.get<any[]>('http://localhost:8080/api/receptek')
       .subscribe(adatok => {
         this.recipes = adatok;
@@ -34,7 +48,73 @@ export class RecipeListComponent implements OnInit {
       });
   }
 
-  // A szűrési logikát egyszerűsítése (cím alapú keresés)
+  kattintasBejelentkezesre() {
+    if (this.bejelentkezve) {
+      this.bejelentkezve = false;
+      this.urlapNyitva = false;
+      alert('Sikeres kijelentkezés! Várunk vissza!'); 
+    } else {
+      this.kotelezoBejelentkezes = false;
+      this.bejelentkezoAblakNyitva = true;
+    }
+  }
+
+  belepes() {
+    if (this.loginAdatok.email !== '' && this.loginAdatok.jelszo !== '') {
+      
+      this.http.post<any>('http://localhost:8080/api/login', this.loginAdatok)
+        .subscribe({
+          next: (adatbazisFelhasznalo) => {
+            this.bejelentkezve = true;
+            this.bejelentkezoAblakNyitva = false; 
+            this.loginAdatok = { email: '', jelszo: '' }; 
+            this.cdr.detectChanges();
+
+            setTimeout(() => {
+              alert('Sikeres bejelentkezés! Üdvözlünk újra, ' + adatbazisFelhasznalo.username + '!'); 
+            }, 150);
+            
+          },
+          error: (hiba) => {
+            console.error('Bejelentkezési hiba:', hiba);
+            alert('Hibás e-mail cím vagy jelszó! Ellenőrizd az adatokat.');
+          }
+        });
+
+    } else {
+      alert('Töltsd ki az e-mailt és a jelszót is!');
+    }
+  }
+
+  profilMegnyitas() {
+    alert('Itt lesz a profilod! Később ide tehetjük a saját receptjeidet vagy a beállításokat.');
+  }
+
+  ujReceptKattintas() {
+    if (this.bejelentkezve) {
+      this.urlapNyitva = !this.urlapNyitva;
+    } else {
+      this.kotelezoBejelentkezes = true; 
+      this.bejelentkezoAblakNyitva = true; 
+    }
+  }
+
+  receptMentes() {
+    this.http.post('http://localhost:8080/api/uj-recept', this.ujReceptAdatok)
+      .subscribe({
+        next: (valasz) => {
+          alert('Sikeres mentés! Bekerült az adatbázisba.');
+          this.betoltes();
+          this.urlapNyitva = false;
+          this.ujReceptAdatok = { title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: '', kepUrl: '' };
+        },
+        error: (hiba) => {
+          console.error('Hiba a mentésnél:', hiba);
+          alert('Nem sikerült elmenteni a receptet!');
+        }
+      });
+  }
+
   get filteredRecipes() {
     return this.recipes.filter(recipe => {
       return recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase());
