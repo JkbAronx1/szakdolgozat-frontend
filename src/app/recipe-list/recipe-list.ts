@@ -18,6 +18,10 @@ export class RecipeListComponent implements OnInit {
   szuroNyitva: boolean = false;
   kivalasztottRecept: any = null;
 
+  szuroKategoria: string = '';
+  szuroNehezseg: string = '';
+  szuroIdo: number | null = null; 
+
   bejelentkezve: boolean = false;
   bejelentkezoAblakNyitva: boolean = false;
   kotelezoBejelentkezes: boolean = false; 
@@ -117,8 +121,27 @@ export class RecipeListComponent implements OnInit {
 
   get filteredRecipes() {
     return this.recipes.filter(recipe => {
-      return recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const egyezikNev = recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      const egyezikKategoria = this.szuroKategoria === '' || 
+        (recipe.kategoria && recipe.kategoria.toLowerCase() === this.szuroKategoria.toLowerCase());
+      
+      const egyezikNehezseg = this.szuroNehezseg === '' || 
+        (recipe.nehezseg && recipe.nehezseg === this.szuroNehezseg);
+
+      const egyezikIdo = this.szuroIdo === null || this.szuroIdo === undefined || 
+        (recipe.ido && recipe.ido <= this.szuroIdo);
+
+      return egyezikNev && egyezikKategoria && egyezikNehezseg && egyezikIdo;
     });
+  }
+
+  szurokTollese() {
+    this.szuroKategoria = '';
+    this.szuroNehezseg = '';
+    this.szuroIdo = null;
+    this.searchTerm = '';
   }
 
   toggleSzuro() {
