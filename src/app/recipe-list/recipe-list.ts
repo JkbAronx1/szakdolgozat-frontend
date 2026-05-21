@@ -44,6 +44,8 @@ export class RecipeListComponent implements OnInit {
   };
 
   recipes: any[] = [];
+  jelenlegiOldal: number = 1;
+  receptekOldalankent: number = 28;
 
   ngOnInit() {
     this.betoltes();
@@ -52,8 +54,9 @@ export class RecipeListComponent implements OnInit {
   betoltes() {
     this.http.get<any[]>('http://localhost:8080/api/receptek')
       .subscribe(adatok => {
-        this.recipes = adatok;
+        this.recipes = adatok || []; 
         console.log('Receptek megérkeztek:', adatok);
+        this.cdr.detectChanges(); 
       });
   }
 
@@ -169,6 +172,30 @@ export class RecipeListComponent implements OnInit {
 
       return egyezikNev && egyezikKategoria && egyezikNehezseg && egyezikIdo;
     });
+  }
+
+  get paginatedRecipes() {
+    const kezdoIndex = (this.jelenlegiOldal - 1) * this.receptekOldalankent;
+    const vegIndex = kezdoIndex + this.receptekOldalankent;
+    return this.filteredRecipes.slice(kezdoIndex, vegIndex);
+  }
+
+  get osszesOldal() {
+    return Math.ceil(this.filteredRecipes.length / this.receptekOldalankent);
+  }
+
+kovetkezoOldal() {
+    if (this.jelenlegiOldal < this.osszesOldal) {
+      this.jelenlegiOldal++;
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    }
+  }
+
+  elozoOldal() {
+    if (this.jelenlegiOldal > 1) {
+      this.jelenlegiOldal--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   szurokTollese() {

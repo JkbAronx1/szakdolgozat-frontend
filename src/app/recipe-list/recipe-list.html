@@ -98,10 +98,34 @@
 
 <div class="recipe-grid">
     <app-recipe-item 
-      *ngFor="let recipe of filteredRecipes" 
+      *ngFor="let recipe of paginatedRecipes" 
       [recipe]="recipe" 
       (cardClick)="kivalasztottRecept = $event">
     </app-recipe-item>
+  </div>
+
+  <div *ngIf="osszesOldal > 1" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 40px; margin-bottom: 20px;">
+    
+    <button (click)="elozoOldal()" 
+            [disabled]="jelenlegiOldal === 1" 
+            style="padding: 10px 20px; border-radius: 10px; border: none; background-color: #34495e; color: white; font-weight: bold; cursor: pointer; transition: 0.3s;"
+            [style.opacity]="jelenlegiOldal === 1 ? '0.5' : '1'"
+            [style.cursor]="jelenlegiOldal === 1 ? 'not-allowed' : 'pointer'">
+      ⬅️ Előző
+    </button>
+    
+    <span style="font-size: 16px; font-weight: bold; color: #2c3e50; background: white; padding: 10px 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+      {{jelenlegiOldal}} / {{osszesOldal}}. oldal
+    </span>
+    
+    <button (click)="kovetkezoOldal()" 
+            [disabled]="jelenlegiOldal === osszesOldal" 
+            style="padding: 10px 20px; border-radius: 10px; border: none; background-color: #34495e; color: white; font-weight: bold; cursor: pointer; transition: 0.3s;"
+            [style.opacity]="jelenlegiOldal === osszesOldal ? '0.5' : '1'"
+            [style.cursor]="jelenlegiOldal === osszesOldal ? 'not-allowed' : 'pointer'">
+      Következő ➡️
+    </button>
+
   </div>
 
   <div class="modal-overlay" *ngIf="kivalasztottRecept" (click)="kivalasztottRecept = null">
