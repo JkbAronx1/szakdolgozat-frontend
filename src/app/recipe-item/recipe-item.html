@@ -1,0 +1,27 @@
+<div class="recipe-card" (click)="kattintasTortent()">
+  
+  <div class="card-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; height: 180px; font-size: 50px; position: relative;">
+    🍳
+    <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 5px;">
+      👤 {{recipe.author || 'Ismeretlen'}}
+    </div>
+  </div>
+  
+  <div class="card-content">
+    <span class="badge">{{recipe.kategoria}}</span>
+    <h3>{{recipe.title}}</h3>
+    
+    <div class="recipe-stats">
+      <div class="stat">
+        <small>NEHÉZSÉG</small>
+        <div class="stat-value">{{recipe.nehezseg}}</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <small>ELKÉSZÍTÉSI IDŐ</small>
+        <div class="stat-value">{{recipe.ido}} perc</div>
+      </div>
+    </div>
+  </div>
+
+</div>

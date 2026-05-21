@@ -1,0 +1,9 @@
+.recipe-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; cursor: pointer; transition: 0.3s; }
+.recipe-card:hover { transform: scale(1.02); }
+.card-img { width: calc(100% + 40px); height: 180px; object-fit: cover; border-radius: 20px 20px 0 0; margin: -20px -20px 15px -20px; }
+.badge { background: #fff3e0; color: #e67e22; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+.recipe-card h3 { margin: 10px 0; font-size: 1.1rem; color: #333; min-height: 45px; }
+.recipe-stats { display: flex; justify-content: space-around; align-items: center; padding-top: 15px; margin-top: 15px; border-top: 1px solid #f0f0f0; text-align: center; }
+.stat small { display: block; color: #a0a0a0; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.8px; margin-bottom: 3px; text-transform: uppercase; }
+.stat-value { color: #2c3e50; font-size: 0.85rem; font-weight: 600; }
+.stat-divider { width: 1px; height: 25px; background-color: #eee; }

@@ -5,7 +5,7 @@ import { RecipeListComponent } from './recipe-list/recipe-list';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RecipeListComponent],
+  imports: [RecipeListComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
