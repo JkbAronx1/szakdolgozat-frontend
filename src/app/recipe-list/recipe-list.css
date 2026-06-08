@@ -1,75 +1,163 @@
+
+/* 1. ALAPOK ÉS HÁTTÉR                        */
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #fdfbf7;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  padding-bottom: 50px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
 .container { 
   max-width: 1200px; 
   margin: 0 auto; 
   padding: 20px; 
-  font-family: 'Segoe UI', sans-serif; 
 }
+
+/* 2. FEJLÉC ÉS KERESŐ  */
 
 .header-bar {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-bottom: 5px solid #000;
+  box-shadow: 0 10px 0 -5px #000;
+  margin-bottom: 40px;
+}
+
+.input__container {
+  position: relative;
+  background: #f0f0f0;
+  padding: 15px;
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 15px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  border: 4px solid #000;
+  max-width: 400px;
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  transform: rotateX(10deg) rotateY(-10deg);
+  perspective: 1000px;
+  box-shadow: 10px 10px 0 #000;
 }
 
-.header-search-bar {
-  flex: 1;
-  display: flex;
-  background: #f4f6f8;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #e0e0e0;
+.input__container:hover {
+  transform: rotateX(5deg) rotateY(1deg) scale(1.05);
+  box-shadow: 25px 25px 0 -5px #e9b50b, 25px 25px 0 0 #000;
 }
 
-.header-search-bar input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  padding: 12px 20px;
-  font-size: 15px;
-  outline: none;
-  color: #333;
+.shadow__input {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  transform: translateZ(-50px);
+  background: linear-gradient(45deg, rgba(255, 107, 107, 0.4) 0%, rgba(255, 107, 107, 0.1) 100%);
+  filter: blur(20px);
 }
 
-.header-search-btn {
-  background: #fffffe;
-  border: none;
-  padding: 0 25px;
+.input__button__shadow {
   cursor: pointer;
-  font-size: 18px;
-  transition: background 0.2s;
+  border: 3px solid #000;
+  background: #e9b50b;
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  transform: translateZ(20px);
+  position: relative;
+  z-index: 3;
 }
-.header-search-btn:hover { background: #b7b7b7; }
+
+.input__button__shadow:hover {
+  background: #e9b50b;
+  transform: translateZ(10px) translateX(-5px) translateY(-5px);
+  box-shadow: 5px 5px 0 0 #000;
+}
+
+.input__button__shadow svg { fill: #000; width: 25px; height: 25px; }
+
+.input__search {
+  width: 100%;
+  outline: none;
+  border: 3px solid #000;
+  padding: 15px;
+  font-size: 18px;
+  background: #fff;
+  color: #000;
+  transform: translateZ(10px);
+  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  z-index: 3;
+  font-weight: 900;
+}
+
+.input__search::placeholder { color: #666; font-weight: bold; text-transform: uppercase; }
+
+.input__search:hover, .input__search:focus {
+  background: #f0f0f0;
+  transform: translateZ(20px) translateX(-5px) translateY(-5px);
+  box-shadow: 5px 5px 0 0 #000;
+}
+
+.input__container::before {
+  content: "KERESÉS";
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  background: #e9b50b;
+  color: #000;
+  font-weight: bold;
+  padding: 5px 10px;
+  font-size: 14px;
+  transform: translateZ(50px);
+  z-index: 4;
+  border: 2px solid #000;
+}
+
+/* 3. GOMBOK ÉS SZŰRŐ */
 
 .header-action-btn {
-  background: white;
-  border: 2px solid #000;
-  color: #000;
-  padding: 10px 20px;
-  font-weight: 800;
-  border-radius: 6px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  transition: transform 0.1s, background 0.2s;
+  border: 4px solid #000;
+  background: #fff; 
+  color: #000;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  box-shadow: 6px 6px 0 0 #000;
+  transition: all 0.2s ease-in-out;
+  letter-spacing: 1px;
 }
-.header-action-btn:active { transform: scale(0.95); }
 
-.btn-login:hover { background: #f0f0f0; }
+.header-action-btn:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 0 #000;
+}
 
-.btn-upload { background: #a3d200; }
-.btn-upload:hover { background: #8ebd00; }
+.header-action-btn:nth-of-type(2) { background: #ff6b6b; color: white; } 
+.header-action-btn.btn-login { background: #4ecdc4; } 
+.header-action-btn.btn-upload { background: #ffe66d; }
 
 .filter-panel {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease-out, opacity 0.3s;
   opacity: 0;
-  background: #f9f9f9;
-  border-radius: 20px;
+  background: #fff;
+  border: 4px solid transparent; 
   margin-bottom: 20px;
 }
 
@@ -77,7 +165,8 @@
   max-height: 800px; 
   opacity: 1; 
   padding: 20px; 
-  border: 1px solid #eee; 
+  border-color: #000;
+  box-shadow: 8px 8px 0 0 #000;
 }
 
 .filter-grid { 
@@ -85,84 +174,137 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
   gap: 20px; 
 }
-.filter-box label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
-.filter-box select { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid #ddd; }
+
+.filter-box label { display: block; font-weight: 900; margin-bottom: 8px; color: #000; text-transform: uppercase; }
+.filter-box select, .filter-box input { 
+  width: 100%; 
+  padding: 12px; 
+  border: 3px solid #000; 
+  background: #fff; 
+  font-weight: bold; 
+  outline: none;
+  transition: 0.2s;
+}
+.filter-box select:focus, .filter-box input:focus { background: #fff; box-shadow: 4px 4px 0 0 #000; }
+
+
+/* 4. RECEPTEK RÁCSA */
 
 .recipe-grid { 
   display: grid; 
-  grid-template-columns: repeat(4, 1fr); 
-  gap: 20px; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 30px; 
   width: 100%; 
-  margin-top: 20px;
+  margin-top: 20px; 
 }
 
-.recipe-card {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  border: 1px solid #f0f0f0;
+@media (max-width: 900px) { .recipe-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .recipe-grid { grid-template-columns: 1fr; } }
+
+/* 5. ABLAKOK (LOGIN / REGISZTRÁCIÓ)  */
+
+.modal-overlay { 
+  position: fixed; 
+  top: 0; left: 0; width: 100%; height: 100%; 
+  background: rgba(0,0,0,0.8); 
+  display: flex; justify-content: center; align-items: center; 
+  z-index: 1000; 
+}
+
+.modal-content { 
+  background: #fff; 
+  width: 90%; 
+  max-width: 500px; 
+  max-height: 90vh; 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  border: 5px solid #000; 
+  box-shadow: 15px 15px 0 0 #000; 
+  position: relative; 
+  animation: slideUp 0.3s ease-out; 
+}
+
+@keyframes slideUp { 
+  from { transform: translateY(50px); opacity: 0; } 
+  to { transform: translateY(0); opacity: 1; } 
+}
+
+.modal-body { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+
+.close-btn { 
+  position: absolute; top: 15px; right: 15px; 
+  font-size: 20px; font-weight: 900; 
+  border: 4px solid #000; background: #ff6b6b; color: #fff; 
+  width: 45px; height: 45px; 
+  cursor: pointer; z-index: 10; 
+  box-shadow: 4px 4px 0 0 #000; transition: 0.2s; 
+}
+.close-btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 #000; }
+
+.modal-body input, .modal-body textarea, .modal-body select {
+  border: 3px solid #000; padding: 12px; font-weight: bold; outline: none; background: #fff; transition: 0.2s;
+}
+.modal-body input:focus, .modal-body textarea:focus, .modal-body select:focus { background: #fff; box-shadow: 4px 4px 0 0 #000; }
+
+.modal-body button { 
+  background: #ffe66d; border: 4px solid #000; padding: 15px; 
+  font-weight: 900; text-transform: uppercase; cursor: pointer; 
+  box-shadow: 5px 5px 0 0 #000; transition: 0.2s; margin-top: 10px; 
+}
+.modal-body button:hover { transform: translate(3px, 3px); box-shadow: 2px 2px 0 0 #000; }
+
+/* 6. KLASSZIKUS RECEPT ABLAK (SZÖGLETESEN!)  */
+
+.classic-modal {
+  background: white; 
+  width: 90%; 
+  max-width: 600px; 
+  max-height: 90vh; 
+  border-radius: 0; /* ⬅️ Nincs lekerekítés! */
+  border: none; /* Nincs vastag fekete keret, csak egy vékonyabb */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Lágy árnyék maradt */
+  overflow-y: auto; 
+  overflow-x: hidden;
+  position: relative; 
+  animation: slideUp 0.3s ease-out; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Finomabb font */
+}
+
+.classic-close-btn {
+  position: absolute; top: 15px; right: 15px; 
+  font-size: 28px; border: none; 
+  background: white; color: #888; /* Szürke bezáró gomb */
+  border-radius: 50%; width: 40px; height: 40px; 
+  cursor: pointer; z-index: 10; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+  transition: 0.2s; display: flex; justify-content: center; align-items: center;
+}
+
+.classic-close-btn:hover { color: #ff6b6b; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+/* 7. CSILLAGOS ÉRTÉKELŐ        */
+
+.rating { display: inline-block; }
+.rating:not(:checked) > input { position: absolute; appearance: none; opacity: 0; }
+.rating:not(:checked) > label { float: right; cursor: pointer; font-size: 35px; color: #ddd; }
+.rating:not(:checked) > label:before { content: "★"; }
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label { color: #e58e09; }
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label { color: #ff9e0b; }
+.rating > input:checked ~ label { color: #ffa723; }
+
+.pagination-btn {
+  padding: 12px 25px;
+  font-weight: 900;
   cursor: pointer;
-  transition: 0.3s;
+  background: #fff;
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0 0 #000;
+  transition: 0.2s;
 }
-.recipe-card:hover { transform: scale(1.02); }
-
-.card-img {
-  width: calc(100% + 40px);
-  height: 180px;
-  object-fit: cover;
-  border-radius: 20px 20px 0 0;
-  margin: -20px -20px 15px -20px;
-}
-
-.badge { background: #fff3e0; color: #e67e22; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-
-.recipe-card h3 {
-  margin: 10px 0;
-  font-size: 1.1rem;
-  color: #333;
-  min-height: 45px;
-}
-
-.recipe-stats {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding-top: 15px;
-  margin-top: 15px;
-  border-top: 1px solid #f0f0f0;
-  text-align: center;
-}
-
-.stat small {
-  display: block;
-  color: #a0a0a0;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  margin-bottom: 3px;
-  text-transform: uppercase;
-}
-
-.stat-value {
-  color: #2c3e50;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 25px;
-  background-color: #eee;
-}
-
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: 20px; overflow-y: auto; position: relative; animation: slideUp 0.3s ease-out; }
-@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-body { padding: 30px; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; border: none; background: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 10; }
-
-
-@media (max-width: 1100px) { .recipe-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 800px) { .recipe-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 500px) { .recipe-grid { grid-template-columns: 1fr; } }
+.pagination-btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 #000; }
+.pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -16,6 +16,7 @@ export class RecipeListComponent implements OnInit {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- ALAP ADATOK ---
   searchTerm: string = '';
   szuroNyitva: boolean = false;
   kivalasztottRecept: any = null;
@@ -24,7 +25,9 @@ export class RecipeListComponent implements OnInit {
   szuroNehezseg: string = '';
   szuroIdo: number | null = null; 
 
+  // --- FELHASZNÁLÓI ADATOK ---
   bejelentkezve: boolean = false;
+  bejelentkezettFelhasznaloNev: string = ''; 
   bejelentkezoAblakNyitva: boolean = false;
   kotelezoBejelentkezes: boolean = false; 
   loginAdatok = { email: '', jelszo: '' };
@@ -34,18 +37,17 @@ export class RecipeListComponent implements OnInit {
 
   urlapNyitva: boolean = false;
   ujReceptAdatok = {
-    title: '',
-    description: '',
-    author: '',
-    ido: 0,
-    nehezseg: 'Könnyű',
-    kategoria: '',
-    kepUrl: ''
+    title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: '', kepUrl: ''
   };
 
+  // --- KOMMENT ÉS ÉRTÉKELÉS VÁLTOZÓK ---
+  ujErtekeles: number = 0;
+  ujHozzaszolasText: string = '';
+
+  // --- RECEPTEK ÉS LAPOZÁS ---
   recipes: any[] = [];
   jelenlegiOldal: number = 1;
-  receptekOldalankent: number = 28;
+  receptekOldalankent: number = 21;
 
   ngOnInit() {
     this.betoltes();
@@ -55,11 +57,38 @@ export class RecipeListComponent implements OnInit {
     this.http.get<any[]>('http://localhost:8080/api/receptek')
       .subscribe(adatok => {
         this.recipes = adatok || []; 
-        console.log('Receptek megérkeztek:', adatok);
         this.cdr.detectChanges(); 
       });
   }
 
+  // --- KOMMENT ÉS ÉRTÉKELÉS MENTÉSE (Dinamikus névvel) ---
+  hozzaszolasKuld() {
+    if (!this.kivalasztottRecept) return;
+    
+    // Ellenőrzés: minimum egyiknek meg kell lennie
+    if (this.ujErtekeles === 0 && this.ujHozzaszolasText.trim() === '') {
+      alert("Kérlek, adj meg egy értékelést VAGY írj egy hozzászólást!");
+      return;
+    }
+
+    if (!this.kivalasztottRecept.hozzaszolasok) {
+      this.kivalasztottRecept.hozzaszolasok = [];
+    }
+
+    // Név meghatározása
+    const megjelenithetoNev = this.bejelentkezve ? this.bejelentkezettFelhasznaloNev : "Vendég";
+
+    this.kivalasztottRecept.hozzaszolasok.unshift({
+      felhasznalo: megjelenithetoNev, 
+      ertekeles: this.ujErtekeles,
+      szoveg: this.ujHozzaszolasText.trim()
+    });
+
+    this.ujErtekeles = 0;
+    this.ujHozzaszolasText = '';
+  }
+
+  // --- AZONOSÍTÁS ÉS REGISZTRÁCIÓ ---
   megnyitRegisztracio() {
     this.bejelentkezoAblakNyitva = false;
     this.regisztraciosAblakNyitva = true;
@@ -90,13 +119,10 @@ export class RecipeListComponent implements OnInit {
             this.bejelentkezoAblakNyitva = true; 
             this.regAdatok = { username: '', email: '', jelszo: '', jelszoUjra: '' }; 
           },
-          error: (hiba) => {
-            console.error('Regisztrációs hiba:', hiba);
-            alert('Hiba történt a regisztráció során!');
-          }
+          error: (hiba) => { alert('Hiba történt a regisztráció során!'); }
         });
     } else {
-      alert('Kérlek, minden mezőt tölts ki a regisztrációhoz!');
+      alert('Kérlek, minden mezőt tölts ki!');
     }
   }
 
@@ -104,7 +130,7 @@ export class RecipeListComponent implements OnInit {
     if (this.bejelentkezve) {
       this.bejelentkezve = false;
       this.urlapNyitva = false;
-      alert('Sikeres kijelentkezés! Várunk vissza!'); 
+      alert('Sikeres kijelentkezés!'); 
     } else {
       this.kotelezoBejelentkezes = false;
       this.bejelentkezoAblakNyitva = true;
@@ -117,21 +143,16 @@ export class RecipeListComponent implements OnInit {
         .subscribe({
           next: (adatbazisFelhasznalo) => {
             this.bejelentkezve = true;
+            this.bejelentkezettFelhasznaloNev = adatbazisFelhasznalo.username; // Név mentése
             this.bejelentkezoAblakNyitva = false; 
             this.loginAdatok = { email: '', jelszo: '' }; 
             this.cdr.detectChanges();
-
-            setTimeout(() => {
-              alert('Sikeres bejelentkezés! Üdvözlünk újra, ' + adatbazisFelhasznalo.username + '!'); 
-            }, 150);
+            alert('Sikeres bejelentkezés, ' + adatbazisFelhasznalo.username + '!'); 
           },
-          error: (hiba) => {
-            console.error('Bejelentkezési hiba:', hiba);
-            alert('Hibás e-mail cím vagy jelszó! Ellenőrizd az adatokat.');
-          }
+          error: () => { alert('Hibás e-mail cím vagy jelszó!'); }
         });
     } else {
-      alert('Töltsd ki az e-mailt és a jelszót is!');
+      alert('Töltsd ki a mezőket!');
     }
   }
 
@@ -147,29 +168,23 @@ export class RecipeListComponent implements OnInit {
   receptMentes() {
     this.http.post('http://localhost:8080/api/uj-recept', this.ujReceptAdatok)
       .subscribe({
-        next: (valasz) => {
-          alert('Sikeres mentés! Bekerült az adatbázisba.');
+        next: () => {
+          alert('Sikeres mentés!');
           this.betoltes();
           this.urlapNyitva = false;
           this.ujReceptAdatok = { title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: '', kepUrl: '' };
         },
-        error: (hiba) => {
-          console.error('Hiba a mentésnél:', hiba);
-          alert('Nem sikerült elmenteni a receptet!');
-        }
+        error: () => { alert('Nem sikerült elmenteni!'); }
       });
   }
 
+  // --- SZŰRŐ ÉS LAPOZÁS LOGIKA ---
   get filteredRecipes() {
     return this.recipes.filter(recipe => {
       const egyezikNev = recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const egyezikKategoria = this.szuroKategoria === '' || 
-        (recipe.kategoria && recipe.kategoria.toLowerCase() === this.szuroKategoria.toLowerCase());
-      const egyezikNehezseg = this.szuroNehezseg === '' || 
-        (recipe.nehezseg && recipe.nehezseg === this.szuroNehezseg);
-      const egyezikIdo = this.szuroIdo === null || this.szuroIdo === undefined || 
-        (recipe.ido && recipe.ido <= this.szuroIdo);
-
+      const egyezikKategoria = this.szuroKategoria === '' || (recipe.kategoria && recipe.kategoria.toLowerCase() === this.szuroKategoria.toLowerCase());
+      const egyezikNehezseg = this.szuroNehezseg === '' || (recipe.nehezseg && recipe.nehezseg === this.szuroNehezseg);
+      const egyezikIdo = this.szuroIdo === null || this.szuroIdo === undefined || (recipe.ido && recipe.ido <= this.szuroIdo);
       return egyezikNev && egyezikKategoria && egyezikNehezseg && egyezikIdo;
     });
   }
@@ -181,10 +196,10 @@ export class RecipeListComponent implements OnInit {
   }
 
   get osszesOldal() {
-    return Math.ceil(this.filteredRecipes.length / this.receptekOldalankent);
+    return Math.ceil(this.filteredRecipes.length / this.receptekOldalankent) || 1;
   }
 
-kovetkezoOldal() {
+  kovetkezoOldal() {
     if (this.jelenlegiOldal < this.osszesOldal) {
       this.jelenlegiOldal++;
       window.scrollTo({ top: 0, behavior: 'smooth' }); 
@@ -199,13 +214,8 @@ kovetkezoOldal() {
   }
 
   szurokTollese() {
-    this.szuroKategoria = '';
-    this.szuroNehezseg = '';
-    this.szuroIdo = null; 
-    this.searchTerm = '';
+    this.szuroKategoria = ''; this.szuroNehezseg = ''; this.szuroIdo = null; this.searchTerm = '';
   }
 
-  toggleSzuro() {
-    this.szuroNyitva = !this.szuroNyitva;
-  }
+  toggleSzuro() { this.szuroNyitva = !this.szuroNyitva; }
 }
