@@ -35,9 +35,18 @@ export class RecipeListComponent implements OnInit {
   regisztraciosAblakNyitva: boolean = false;
   regAdatok = { username: '', email: '', jelszo: '', jelszoUjra: '' };
 
+  // --- TOAST ÜZENET (Jobb felső sarok) ---
+  toastUzenet: string = '';
+
+  jelszoLathato: boolean = false;
+
+  toggleJelszoMutatasa() {
+    this.jelszoLathato = !this.jelszoLathato;
+  }
+
   urlapNyitva: boolean = false;
   ujReceptAdatok = {
-    title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: '', kepUrl: ''
+    title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: ''
   };
 
   // --- KOMMENT ÉS ÉRTÉKELÉS VÁLTOZÓK ---
@@ -61,11 +70,23 @@ export class RecipeListComponent implements OnInit {
       });
   }
 
-  // --- KOMMENT ÉS ÉRTÉKELÉS MENTÉSE (Dinamikus névvel) ---
+  // --- LOKÁLIS KÉP KIVÁLASZTÁSA ---
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.ujReceptAdatok.kepUrl = reader.result as string; 
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // --- KOMMENT ÉS ÉRTÉKELÉS MENTÉSE ---
   hozzaszolasKuld() {
     if (!this.kivalasztottRecept) return;
     
-    // Ellenőrzés: minimum egyiknek meg kell lennie
     if (this.ujErtekeles === 0 && this.ujHozzaszolasText.trim() === '') {
       alert("Kérlek, adj meg egy értékelést VAGY írj egy hozzászólást!");
       return;
@@ -75,7 +96,6 @@ export class RecipeListComponent implements OnInit {
       this.kivalasztottRecept.hozzaszolasok = [];
     }
 
-    // Név meghatározása
     const megjelenithetoNev = this.bejelentkezve ? this.bejelentkezettFelhasznaloNev : "Vendég";
 
     this.kivalasztottRecept.hozzaszolasok.unshift({
@@ -101,6 +121,17 @@ export class RecipeListComponent implements OnInit {
 
   regisztracio() {
     if (this.regAdatok.username && this.regAdatok.email && this.regAdatok.jelszo && this.regAdatok.jelszoUjra) {
+      
+      if (!this.regAdatok.email.includes('@')) {
+        this.toastUzenet = 'Hibás e-mail cím';
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.toastUzenet = '';
+          this.cdr.detectChanges();
+        }, 5000);
+        return;
+      }
+
       if (this.regAdatok.jelszo !== this.regAdatok.jelszoUjra) {
         alert('Hiba: A két jelszó nem egyezik meg!');
         return;
@@ -114,10 +145,17 @@ export class RecipeListComponent implements OnInit {
       this.http.post('http://localhost:8080/api/uj-felhasznalo', formData, { responseType: 'text' })
         .subscribe({
           next: (valasz) => {
-            alert(valasz); 
             this.regisztraciosAblakNyitva = false;
             this.bejelentkezoAblakNyitva = true; 
             this.regAdatok = { username: '', email: '', jelszo: '', jelszoUjra: '' }; 
+
+            this.toastUzenet = valasz || 'Sikeres regisztráció!';
+            this.cdr.detectChanges();
+
+            setTimeout(() => {
+              this.toastUzenet = '';
+              this.cdr.detectChanges();
+            }, 5000);
           },
           error: (hiba) => { alert('Hiba történt a regisztráció során!'); }
         });
@@ -128,9 +166,19 @@ export class RecipeListComponent implements OnInit {
 
   kattintasBejelentkezesre() {
     if (this.bejelentkezve) {
+      const felhasznaloNev = this.bejelentkezettFelhasznaloNev;
       this.bejelentkezve = false;
-      this.urlapNyitva = false;
-      alert('Sikeres kijelentkezés!'); 
+      this.bejelentkezettFelhasznaloNev = '';
+      this.urlapNyitva = false; 
+
+      this.toastUzenet = 'Viszontlátásra, ' + (felhasznaloNev || 'Felhasználó') + '! Sikeres kijelentkezés.';
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.toastUzenet = '';
+        this.cdr.detectChanges();
+      }, 5000);
+
     } else {
       this.kotelezoBejelentkezes = false;
       this.bejelentkezoAblakNyitva = true;
@@ -143,13 +191,28 @@ export class RecipeListComponent implements OnInit {
         .subscribe({
           next: (adatbazisFelhasznalo) => {
             this.bejelentkezve = true;
-            this.bejelentkezettFelhasznaloNev = adatbazisFelhasznalo.username; // Név mentése
-            this.bejelentkezoAblakNyitva = false; 
+            this.bejelentkezettFelhasznaloNev = adatbazisFelhasznalo.username; 
             this.loginAdatok = { email: '', jelszo: '' }; 
+
+            this.bejelentkezoAblakNyitva = false; 
+
+            this.toastUzenet = 'Sikeres bejelentkezés, ' + adatbazisFelhasznalo.username + '!';
             this.cdr.detectChanges();
-            alert('Sikeres bejelentkezés, ' + adatbazisFelhasznalo.username + '!'); 
+
+            setTimeout(() => {
+              this.toastUzenet = '';
+              this.cdr.detectChanges();
+            }, 5000);
           },
-          error: () => { alert('Hibás e-mail cím vagy jelszó!'); }
+          error: () => {
+            this.toastUzenet = 'Hibás e-mail cím vagy jelszó';
+            this.cdr.detectChanges();
+
+            setTimeout(() => {
+              this.toastUzenet = '';
+              this.cdr.detectChanges();
+            }, 5000);
+          }
         });
     } else {
       alert('Töltsd ki a mezőket!');
@@ -166,13 +229,21 @@ export class RecipeListComponent implements OnInit {
   }
 
   receptMentes() {
+    this.ujReceptAdatok.author = this.bejelentkezettFelhasznaloNev || 'Ismeretlen';
+
     this.http.post('http://localhost:8080/api/uj-recept', this.ujReceptAdatok)
       .subscribe({
         next: () => {
-          alert('Sikeres mentés!');
+          this.toastUzenet = 'Sikeres receptfeltöltés!';
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.toastUzenet = '';
+            this.cdr.detectChanges();
+          }, 5000);
+
           this.betoltes();
           this.urlapNyitva = false;
-          this.ujReceptAdatok = { title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: '', kepUrl: '' };
+          this.ujReceptAdatok = { title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: '' };
         },
         error: () => { alert('Nem sikerült elmenteni!'); }
       });

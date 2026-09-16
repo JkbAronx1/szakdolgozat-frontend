@@ -1,5 +1,10 @@
 <div class="container">
 
+  <!-- JOBB FELSŐ SAROKBAN FELUGRÓ ÉRTESÍTÉS -->
+  <div *ngIf="toastUzenet" [style.background]="toastUzenet.includes('Kijelentkezés') || toastUzenet.includes('Viszontlátásra') || toastUzenet.includes('Hibás') ? '#ff6b6b' : '#2ecc71'" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
+    {{ toastUzenet }}
+  </div>
+
   <div class="header-bar">
     <div class="input__container">
       <div class="shadow__input"></div>
@@ -18,11 +23,12 @@
   </div>
 
   <div class="filter-panel" [class.show]="szuroNyitva">
-    <h3 style="margin-top: 0;">🔍 Receptek szűrése</h3>
-    <div class="filter-grid">
-      <div class="filter-box">
-        <label>Kategória szerint</label>
-        <select [(ngModel)]="szuroKategoria">
+    <h3 style="margin-top: 0; font-weight: 900; text-transform: uppercase;">🔍 Receptek szűrése</h3>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end;">
+      
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kategória szerint</label>
+        <select [(ngModel)]="szuroKategoria" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
           <option value="">Összes kategória</option>
           <option value="Főétel">Főétel</option>
           <option value="Desszert">Desszert</option>
@@ -30,47 +36,81 @@
           <option value="Leves">Leves</option>
         </select>
       </div>
-      <div class="filter-box">
-        <label>Nehézségi szint</label>
-        <select [(ngModel)]="szuroNehezseg">
+
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Nehézségi szint</label>
+        <select [(ngModel)]="szuroNehezseg" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
           <option value="">Mindegyik szint</option>
           <option value="Könnyű">Könnyű</option>
           <option value="Közepes">Közepes</option>
           <option value="Nehéz">Nehéz</option>
         </select>
       </div>
+
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Max. elkészítési idő (perc)</label>
+        <input type="number" [(ngModel)]="szuroIdo" placeholder="Pl.: 45" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
       <div class="filter-box">
-        <label>Max. elkészítési idő (perc)</label>
-        <input type="number" [(ngModel)]="szuroIdo" placeholder="Pl.: 45">
+        <button class="header-action-btn" style="width: 100%; justify-content: center; background: #fff; border: 3px solid #000; padding: 11px 15px; box-shadow: 4px 4px 0 0 #000; font-weight: 900; cursor: pointer;" (click)="szurokTollese()">🗑️ Szűrők törlése</button>
       </div>
-      <div class="filter-box" style="display: flex; align-items: flex-end;">
-        <button class="header-action-btn" style="width: 100%; justify-content: center; background: #fff;" (click)="szurokTollese()">🗑️ Szűrők törlése</button>
-      </div>
+
     </div>
   </div>
 
   <div class="filter-panel show" *ngIf="urlapNyitva">
-    <h3 style="margin-top: 0;">Csináljunk egy új receptet!</h3>
-    <div class="filter-grid">
-      <div class="filter-box"><label>Recept neve</label><input type="text" [(ngModel)]="ujReceptAdatok.title"></div>
-      <div class="filter-box"><label>Szerző neve</label><input type="text" [(ngModel)]="ujReceptAdatok.author"></div>
-      <div class="filter-box"><label>Kategória</label><input type="text" [(ngModel)]="ujReceptAdatok.kategoria"></div>
-      <div class="filter-box"><label>Elkészítési idő (perc)</label><input type="number" [(ngModel)]="ujReceptAdatok.ido"></div>
-      <div class="filter-box">
-        <label>Nehézség</label>
-        <select [(ngModel)]="ujReceptAdatok.nehezseg">
+    <h3 style="margin-top: 0; font-weight: 900; text-transform: uppercase; margin-bottom: 25px;">Csináljunk egy új receptet!</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+      
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Recept neve</label>
+        <input type="text" [(ngModel)]="ujReceptAdatok.title" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kategória</label>
+        <select [(ngModel)]="ujReceptAdatok.kategoria" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+          <option value="Főétel">Főétel</option>
+          <option value="Desszert">Desszert</option>
+          <option value="Előétel">Előétel</option>
+          <option value="Leves">Leves</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Idő (perc)</label>
+        <input type="number" [(ngModel)]="ujReceptAdatok.ido" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Nehézség</label>
+        <select [(ngModel)]="ujReceptAdatok.nehezseg" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
           <option value="Könnyű">Könnyű</option>
           <option value="Közepes">Közepes</option>
           <option value="Nehéz">Nehéz</option>
         </select>
       </div>
-      <div class="filter-box"><label>Kép URL (link)</label><input type="text" [(ngModel)]="ujReceptAdatok.kepUrl" placeholder="https://..."></div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kép kiválasztása a gépről</label>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 7px; background: #fff; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1; margin-top: 10px;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Hozzávalók</label>
+        <textarea [(ngModel)]="ujReceptAdatok.hozzavalok" rows="4" placeholder="Írd le a hozzávalókat..." style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 15px; background: #fff; font-weight: bold; font-family: inherit; resize: vertical; outline: none;"></textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1; margin-top: 10px;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Elkészítés / Leírás</label>
+        <textarea [(ngModel)]="ujReceptAdatok.description" rows="5" placeholder="Írd le a lépéseket..." style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 15px; background: #fff; font-weight: bold; font-family: inherit; resize: vertical; outline: none;"></textarea>
+      </div>
+
     </div>
-    <div class="filter-box" style="margin-top: 15px;">
-      <label>Elkészítés / Leírás</label>
-      <textarea [(ngModel)]="ujReceptAdatok.description" rows="3" placeholder="Írd le a lépéseket..."></textarea>
-    </div>
-    <button class="header-action-btn btn-upload" style="margin-top: 15px; width: 100%; justify-content: center;" (click)="receptMentes()">Recept mentése</button>
+
+    <button class="header-action-btn btn-upload" style="margin-top: 25px; width: 100%; justify-content: center; border: 4px solid #000; padding: 15px; box-shadow: 5px 5px 0 0 #000; font-weight: 900; background: #ffd32a; font-size: 16px; cursor: pointer;" (click)="receptMentes()">Recept mentése</button>
   </div>
 
   <div class="recipe-grid">
@@ -93,6 +133,7 @@
 
   </div>
 
+  <!-- RÉSZLETEK MODAL -->
   <div class="modal-overlay" *ngIf="kivalasztottRecept" (click)="kivalasztottRecept = null">
     <div class="classic-modal" (click)="$event.stopPropagation()">
       <button class="classic-close-btn" (click)="kivalasztottRecept = null">&times;</button>
@@ -105,6 +146,24 @@
         
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
         
+        <!-- HOZZÁVALÓK DOBOZ (Letisztult, listás elrendezésben) -->
+        <div *ngIf="kivalasztottRecept.hozzavalok" style="margin-bottom: 25px;">
+          <h3 style="color: #2c3e50; font-weight: 600; margin-bottom: 10px;">Hozzávalók:</h3>
+          <div style="background: #f9fbfb; padding: 15px 20px; border: 1px solid #eee;">
+            <div *ngFor="let sor of kivalasztottRecept.hozzavalok.split('\n')" style="margin-bottom: 6px;">
+              
+              <div *ngIf="sor.endsWith(':')" style="font-weight: 700; color: #2c3e50; margin-top: 10px; margin-bottom: 4px; font-size: 15px;">
+                {{ sor }}
+              </div>
+
+              <div *ngIf="!sor.endsWith(':') && sor.trim() !== ''" style="color: #444; font-size: 15px; line-height: 1.5;">
+                • {{ sor }}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         <h3 style="color: #2c3e50; font-weight: 600;">Elkészítés:</h3>
         <p style="white-space: pre-wrap; font-weight: normal; color: #444; line-height: 1.8; font-size: 16px;">{{kivalasztottRecept.description}}</p>
 
@@ -176,8 +235,19 @@
         <p *ngIf="!kotelezoBejelentkezes" style="margin: 8px 0 0; font-weight: bold; color: #666;">Jelentkezz be a folytatáshoz.</p>
       </div>
       <div class="modal-body" style="padding: 0; gap: 15px;">
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">E-mail cím</label><input type="email" [(ngModel)]="loginAdatok.email" style="width: 100%; box-sizing: border-box;"></div>
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label><input type="password" [(ngModel)]="loginAdatok.jelszo" style="width: 100%; box-sizing: border-box;"></div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">E-mail cím</label>
+          <input type="email" [(ngModel)]="loginAdatok.email" (keyup.enter)="belepes()" style="width: 100%; box-sizing: border-box; border: 4px solid #000; padding: 10px;">
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label>
+          <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
+            <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="loginAdatok.jelszo" (keyup.enter)="belepes()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+          </div>
+        </div>
+
         <button style="width: 100%; margin-top: 10px; background: #4ecdc4;" (click)="belepes()">Belépés</button>
         <div style="text-align: center; margin-top: 20px; border-top: 4px solid #000; padding-top: 20px;">
           <p style="font-weight: 900; margin: 0 0 10px 0;">Még nincs fiókod?</p>
@@ -196,10 +266,31 @@
         <p style="margin: 8px 0 0; font-weight: bold; color: #666;">Töltsd ki az adatokat.</p>
       </div>
       <div class="modal-body" style="padding: 0; gap: 15px;">
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Felhasználónév</label><input type="text" [(ngModel)]="regAdatok.username" style="width: 100%; box-sizing: border-box;"></div>
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">E-mail</label><input type="email" [(ngModel)]="regAdatok.email" style="width: 100%; box-sizing: border-box;"></div>
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label><input type="password" [(ngModel)]="regAdatok.jelszo" style="width: 100%; box-sizing: border-box;"></div>
-        <div><label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó megerősítése</label><input type="password" [(ngModel)]="regAdatok.jelszoUjra" style="width: 100%; box-sizing: border-box;"></div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Felhasználónév</label>
+          <input type="text" [(ngModel)]="regAdatok.username" (keyup.enter)="regisztracio()" style="width: 100%; box-sizing: border-box; border: 4px solid #000; padding: 10px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">E-mail</label>
+          <input type="email" [(ngModel)]="regAdatok.email" (keyup.enter)="regisztracio()" style="width: 100%; box-sizing: border-box; border: 4px solid #000; padding: 10px;">
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label>
+          <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
+            <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="regAdatok.jelszo" (keyup.enter)="regisztracio()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+          </div>
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó megerősítése</label>
+          <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
+            <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="regAdatok.jelszoUjra" (keyup.enter)="regisztracio()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+          </div>
+        </div>
+
         <button style="width: 100%; margin-top: 10px;" (click)="regisztracio()">Regisztráció</button>
         <div style="text-align: center; margin-top: 20px; border-top: 4px solid #000; padding-top: 20px;">
           <p style="font-weight: 900; margin: 0 0 10px 0;">Már van fiókod?</p>
