@@ -364,20 +364,38 @@ export class RecipeListComponent implements OnInit {
       return;
     }
 
-    if (!this.kivalasztottRecept.hozzaszolasok) {
-      this.kivalasztottRecept.hozzaszolasok = [];
-    }
-
     const megjelenithetoNev = this.bejelentkezve ? this.bejelentkezettFelhasznaloNev : "Vendég";
 
-    this.kivalasztottRecept.hozzaszolasok.unshift({
-      felhasznalo: megjelenithetoNev, 
-      ertekeles: this.ujErtekeles,
-      szoveg: this.ujHozzaszolasText.trim()
-    });
+    const kommentAdat = {
+      receptId: this.kivalasztottRecept.id,
+      szoveg: this.ujHozzaszolasText.trim(),
+      author: megjelenithetoNev
+    };
 
-    this.ujErtekeles = 0;
-    this.ujHozzaszolasText = '';
+    // Elküldjük a backendnek, hogy lementse az adatbázisba
+    this.http.post('http://localhost:8080/api/comments', kommentAdat).subscribe({
+      next: (res: any) => {
+        if (!this.kivalasztottRecept.hozzaszolasok) {
+          this.kivalasztottRecept.hozzaszolasok = [];
+        }
+
+        this.kivalasztottRecept.hozzaszolasok.unshift({
+          felhasznalo: megjelenithetoNev, 
+          ertekeles: this.ujErtekeles,
+          szoveg: this.ujHozzaszolasText.trim()
+        });
+
+        this.ujErtekeles = 0;
+        this.ujHozzaszolasText = '';
+        this.cdr.detectChanges();
+        
+        console.log('Komment sikeresen elmentve az adatbázisba!', res);
+      },
+      error: (err) => {
+        console.error('Hiba a komment mentésekor', err);
+        alert('Nem sikerült elmenteni a hozzászólást!');
+      }
+    });
   }
 
   // --- AZONOSÍTÁS ÉS REGISZTRÁCIÓ ---
@@ -391,30 +409,48 @@ export class RecipeListComponent implements OnInit {
     this.bejelentkezoAblakNyitva = true;
   }
 
-  regisztracio() {
+ regisztracio() {
     if (this.regAdatok.username && this.regAdatok.email && this.regAdatok.jelszo && this.regAdatok.jelszoUjra) {
-      if (this.regAdatok.email.includes(',')) {
+      const email = this.regAdatok.email.trim().toLowerCase();
+
+      if (email.includes(',')) {
         this.toastUzenet = 'Hibás e-mail cím: kérlek, vessző helyett pontot használj!';
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          this.toastUzenet = '';
-          this.cdr.detectChanges();
-        }, 5000);
+        this.hibaIdozito();
         return;
       }
 
-      if (!this.regAdatok.email.includes('@')) {
-        this.toastUzenet = 'Hibás e-mail cím';
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          this.toastUzenet = '';
-          this.cdr.detectChanges();
-        }, 5000);
+      if (!email.includes('@')) {
+        this.toastUzenet = 'Hibás e-mail cím: hiányzik a @ karakter!';
+        this.hibaIdozito();
         return;
       }
 
+      const tiltottElgepelesek = [
+        'gmal.com', 'gamil.com', 'gmai.com', 'gmial.com', 'gail.com',
+        'fremil.hu', 'freemail.h', 'fremail.u', 'freml.hu', 'fremail.com',
+        'hotmai.com', 'hotnail.com', 'hotmaill.com',
+        'outlok.com', 'outlooik.com',
+        'yaho.com', 'yahooo.com'
+      ];
+
+      const domainResz = email.split('@')[1];
+      if (tiltottElgepelesek.includes(domainResz)) {
+        this.toastUzenet = `Úgy tűnik, elgépelted az e-mail címet (${domainResz})!`;
+        this.hibaIdozito();
+        return;
+      }
+
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        this.toastUzenet = 'Hibás e-mail cím formátum!';
+        this.hibaIdozito();
+        return;
+      }
+
+      // --- ITT CSERÉLTÜK LE AZ ALERTET TOASTRA ---
       if (this.regAdatok.jelszo !== this.regAdatok.jelszoUjra) {
-        alert('Hiba: A két jelszó nem egyezik meg!');
+        this.toastUzenet = 'Hiba: A két jelszó nem egyezik meg!';
+        this.hibaIdozito();
         return;
       }
 
@@ -431,18 +467,27 @@ export class RecipeListComponent implements OnInit {
             this.regAdatok = { username: '', email: '', jelszo: '', jelszoUjra: '' }; 
 
             this.toastUzenet = valasz || 'Sikeres regisztráció!';
-            this.cdr.detectChanges();
-
-            setTimeout(() => {
-              this.toastUzenet = '';
-              this.cdr.detectChanges();
-            }, 5000);
+            this.hibaIdozito();
           },
-          error: () => { alert('Hiba történt a regisztráció során!'); }
+          error: () => { 
+            this.toastUzenet = 'Hiba történt a regisztráció során!'; 
+            this.hibaIdozito();
+          }
         });
     } else {
-      alert('Kérlek, minden mezőt tölts ki!');
+      // --- ITT IS LECSERÉLTÜK AZ ALERTET TOASTRA ---
+      this.toastUzenet = 'Kérlek, minden mezőt tölts ki!';
+      this.hibaIdozito();
     }
+  }
+
+  
+  hibaIdozito() {
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.toastUzenet = '';
+      this.cdr.detectChanges();
+    }, 5000);
   }
 
   kattintasBejelentkezesre() {
@@ -513,7 +558,6 @@ export class RecipeListComponent implements OnInit {
   receptMentes() {
     this.ujReceptAdatok.author = this.bejelentkezettFelhasznaloNev || 'Ismeretlen';
 
-    // Ha szerkesztés módban vagyunk, akkor PUT kérést küldünk a meglévő id-re
     if (this.szerkesztesMod && this.szerkesztettReceptId) {
       this.http.put(`http://localhost:8080/api/recept-modositas/${this.szerkesztettReceptId}`, this.ujReceptAdatok, { responseType: 'text' })
         .subscribe({
@@ -534,7 +578,6 @@ export class RecipeListComponent implements OnInit {
           error: () => { alert('Nem sikerült módosítani a receptet!'); }
         });
     } else {
-      // Új recept mentése (POST)
       this.http.post('http://localhost:8080/api/uj-recept', this.ujReceptAdatok)
         .subscribe({
           next: () => {
@@ -566,7 +609,6 @@ export class RecipeListComponent implements OnInit {
     }
 
     return this.recipes.filter(recipe => {
-      // Ha aktív a "Saját receptek" szűrő, csak a bejelentkezett felhasználóét mutatjuk
       const egyezikSajat = !this.sajatReceptekMod || (recipe.author && recipe.author.toLowerCase() === this.bejelentkezettFelhasznaloNev.toLowerCase());
       const egyezikSzezon = !this.szezonMod || this.isSzezonalis(recipe);
       const egyezikNev = recipe.title.toLowerCase().includes(this.searchTerm.toLowerCase());

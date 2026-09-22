@@ -1,11 +1,10 @@
 <div class="container">
-  
-  <!-- ========================================== -->
-  <!-- 🧪 IDEIGLENES SZEZON TESZTELŐ VEZÉRLŐ      -->
-  <!-- ========================================== -->
+
+  <!--SZEZON TESZTELŐ-->
+
   <div style="background: #2d3436; color: #fff; padding: 10px 16px; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
     <span style="font-weight: 900; font-size: 13px; text-transform: uppercase; color: #ffeaa7;">
-      🧪 Évszak tesztelő:
+     Évszak tesztelő:
     </span>
     
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -27,12 +26,10 @@
     </div>
   </div>
 
-  <!-- JOBB FELSŐ SAROKBAN FELUGRÓ ÉRTESÍTÉS -->
-  <div *ngIf="toastUzenet" [style.background]="toastUzenet.includes('Kijelentkezés') || toastUzenet.includes('Viszontlátásra') || toastUzenet.includes('Hibás') ? '#ff6b6b' : '#2ecc71'" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
+  <div *ngIf="toastUzenet" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; background: #ff6b6b; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
     {{ toastUzenet }}
   </div>
 
-  <!-- FŐ FEJLÉC SÁV (Itt van benne a kapcsoló a jobb szélen) -->
   <div class="header-bar">
     <div class="input__container">
       <div class="shadow__input"></div>
