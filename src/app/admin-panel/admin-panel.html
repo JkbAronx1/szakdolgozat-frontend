@@ -1,59 +1,295 @@
-<div class="container" style="max-width: 1000px; margin: 40px auto; font-family: inherit; padding: 20px; color: #fff; position: relative;">
-  
-  <!-- JOBB FELSŐ SAROKBAN FELUGRÓ TOAST ÉRTESÍTÉS -->
-  <div *ngIf="toastUzenet" [style.background]="toastUzenet.includes('Hiba') ? '#ff6b6b' : '#2ecc71'" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
+<div class="container">
+
+  <!-- JOBB FELSŐ SAROKBAN FELUGRÓ ÉRTESÍTÉS -->
+  <div *ngIf="toastUzenet" [style.background]="toastUzenet.toLowerCase().includes('sikeres') ? '#2ecc71' : '#ff6b6b'" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
     {{ toastUzenet }}
   </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 4px solid #fff; padding-bottom: 15px;">
-    <h2 style="margin: 0; font-weight: 900; text-transform: uppercase; color: #fff;">🛡️ Adminisztrációs Vezérlőpult</h2>
-    <a href="/" style="background: #fff; border: 3px solid #000; padding: 8px 15px; font-weight: 900; text-decoration: none; color: #000; box-shadow: 3px 3px 0 0 #000;">← Vissza a fő oldalra</a>
-  </div>
+  <!-- ADMIN FEJLÉC SÁV -->
+  <div class="header-bar" style="display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+    <h2 style="margin: 0; color: #fff; font-weight: 900; background: #ff3366; padding: 10px 18px; border: 3px solid #000; box-shadow: 3px 3px 0 0 #000; text-transform: uppercase;">
+      🛠️ Admin Vezérlőpult
+    </h2>
 
-  <div *ngIf="receptekAdatok.length === 0" style="text-align: center; padding: 40px; font-weight: bold; background: #f8f9fa; border: 3px solid #000; color: #000;">
-    Nincsenek receptek az rendszerben.
-  </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <!-- KÖZÖSSÉGI / ALAP RECEPTEK VÁLTÓ GOMB -->
+      <button class="header-action-btn" 
+              [style.background]="kozossegiMod ? '#ff9ff3' : '#fff'" 
+              style="color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" 
+              (click)="toggleKozossegiMod()">
+        🌍 {{ kozossegiMod ? 'Hivatalos receptek kezelése' : 'Közösségi receptek kezelése' }}
+      </button>
 
-  <!-- Recept kártyák listája -->
-  <div *ngFor="let item of receptekAdatok" style="background: #fff; border: 4px solid #000; box-shadow: 6px 6px 0 0 #000; margin-bottom: 30px; padding: 20px; color: #000;">
-    
-    <!-- Recept fejléc és törlés -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px;">
-      <div>
-        <span style="background: #ffd32a; border: 2px solid #000; padding: 2px 8px; font-size: 12px; font-weight: 900;">ID: {{ item.recept.id }}</span>
-        <h3 style="margin: 8px 0 4px 0; font-size: 20px; font-weight: 900;">{{ item.recept.title }}</h3>
-        <p style="margin: 0; font-size: 14px; color: #666; font-weight: bold;">Szerző: {{ item.recept.author }} | Kategória: {{ item.recept.kategoria }}</p>
-      </div>
-      
-      <button (click)="receptTorles(item.recept.id, item.recept.title)" style="background: #ff6b6b; color: white; border: 3px solid #000; font-weight: 900; padding: 8px 15px; cursor: pointer; box-shadow: 3px 3px 0 0 #000;">
-        🗑️ Teljes recept törlése
+      <!-- ÚJ HIVATALOS RECEPT GOMB -->
+      <button class="header-action-btn btn-upload" style="background: #ffd32a; font-weight: 900; color: #000; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" (click)="ujReceptKattintas()">
+        ⬆️ {{ urlapNyitva ? 'Mégsem' : 'Új Hivatalos Recept' }}
+      </button>
+
+      <!-- VISSZA A FŐOLDALRA -->
+      <button class="header-action-btn" style="background: #a29bfe; color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" (click)="visszaAFooldalra()">
+        🏠 Főoldal
       </button>
     </div>
+  </div>
 
-    <!-- Hozzászólások szekció ezen a recepten belül -->
-    <div style="background: #fdfbf7; border: 2px solid #000; padding: 15px;">
-      <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 900; text-transform: uppercase;">
-        💬 Hozzászólások ehhez a recepthez ({{ item.kommentek.length }} db)
-      </h4>
-
-      <div *ngIf="item.kommentek.length === 0" style="font-size: 13px; color: #888; font-style: italic;">
-        Ehhez a recepthez még nem érkezett hozzászólás.
+  <!-- ŰRLAP PANEL -->
+  <div class="filter-panel show" *ngIf="urlapNyitva" style="padding-bottom: 30px; max-height: 85vh; overflow-y: auto; margin-top: 25px; margin-bottom: 25px;">
+    <h3 style="margin-top: 0; font-weight: 900; text-transform: uppercase; margin-bottom: 25px;">
+      {{ szerkesztesMod ? '✏️ Recept módosítása' : 'Csináljunk egy új receptet!' }}
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;">
+      
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Recept neve</label>
+        <input type="text" [(ngModel)]="ujReceptAdatok.title" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
       </div>
 
-      <!-- Egyedi komment sorok -->
-      <div *ngFor="let k of item.kommentek" style="background: #fff; border: 2px solid #000; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 2px 2px 0 0 #000;">
-        <div>
-          <strong style="color: #2c3e50; font-size: 13px;">{{ k.author }}:</strong>
-          <span style="margin-left: 10px; font-size: 14px; color: #333;">{{ k.szoveg }}</span>
-        </div>
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kategória</label>
+        <select [(ngModel)]="ujReceptAdatok.kategoria" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+          <option value="Reggeli">Reggeli</option>
+          <option value="Tízórai / Uzsonna">Tízórai / Uzsonna</option>
+          <option value="Előétel">Előétel</option>
+          <option value="Leves">Leves</option>
+          <option value="Főétel">Főétel</option>
+          <option value="Street food">Street food</option>
+          <option value="Tészta">Tészta</option>
+          <option value="Köret">Köret</option>
+          <option value="Saláta">Saláta</option>
+          <option value="Desszert">Desszert</option>
+          <option value="Péksütemény">Péksütemény (Kenyér, Kifli)</option>
+          <option value="Snack / Rágcsálnivaló">Snack / Rágcsálnivaló</option>
+          <option value="Ital / Turmix">Ital / Turmix</option>
+          <option value="Szósz / Mártás">Szósz / Mártás</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Idő (perc)</label>
+        <input type="number" [(ngModel)]="ujReceptAdatok.ido" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Adag (fő)</label>
+        <input type="number" [(ngModel)]="ujReceptAdatok.adag" min="1" placeholder="4" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Nehézség</label>
+        <select [(ngModel)]="ujReceptAdatok.nehezseg" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+          <option value="Könnyű">Könnyű</option>
+          <option value="Közepes">Közepes</option>
+          <option value="Nehéz">Nehéz</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kép kiválasztása a gépről</label>
+        <input type="file" id="kepInput" (change)="onFileSelected($event)" accept="image/*" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 7px; background: #fff; font-weight: bold;">
         
-        <button (click)="kommentTorles(k.id)" style="background: #ff6b6b; color: white; border: 2px solid #000; font-weight: 900; padding: 4px 10px; font-size: 12px; cursor: pointer; box-shadow: 2px 2px 0 0 #000;">
-          Törlés
-        </button>
+        <div *ngIf="ujReceptAdatok.kepUrl" style="margin-top: 15px; display: flex; justify-content: center; width: 100%;">
+          <div style="position: relative; display: inline-block;">
+            <img [src]="ujReceptAdatok.kepUrl" alt="Előnézet" style="max-height: 200px; max-width: 100%; object-fit: contain; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; background-color: #fff;">
+            
+            <button (click)="kepTorlese()" title="Kép eltávolítása" style="position: absolute; top: -10px; right: -10px; background: #ff6b6b; color: white; border: 3px solid #000; border-radius: 50%; width: 30px; height: 30px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0 0 #000;">
+              X
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1; margin-top: 10px;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Hozzávalók</label>
+        <textarea [(ngModel)]="ujReceptAdatok.hozzavalok" 
+                  rows="5" 
+                  placeholder="Írd le a hozzávalókat..." 
+                  style="width: 100%; min-height: 120px; box-sizing: border-box; border: 3px solid #000; padding: 15px; background: #fff; font-weight: bold; font-family: inherit; resize: vertical; overflow-y: auto; outline: none; line-height: 1.5;"></textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; grid-column: 1 / -1; margin-top: 10px;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Elkészítés / Leírás</label>
+        <textarea [(ngModel)]="ujReceptAdatok.description" 
+                  rows="6" 
+                  placeholder="Írd le a lépéseket..." 
+                  style="width: 100%; min-height: 140px; box-sizing: border-box; border: 3px solid #000; padding: 15px; background: #fff; font-weight: bold; font-family: inherit; resize: vertical; overflow-y: auto; outline: none; line-height: 1.6;"></textarea>
       </div>
 
     </div>
 
+    <button class="header-action-btn btn-upload" style="margin-top: 25px; margin-bottom: 10px; width: 100%; box-sizing: border-box; justify-content: center; border: 4px solid #000; padding: 15px; box-shadow: 5px 5px 0 0 #000; font-weight: 900; background: #ffd32a; font-size: 16px; cursor: pointer;" (click)="receptMentes()">
+      {{ szerkesztesMod ? '💾 MÓDOSÍTÁSOK MENTÉSE' : 'RECEPT MENTÉSE' }}
+    </button>
+  </div>
+
+  <!-- AKTÍV NÉZET SÁV -->
+  <div [style.background]="kozossegiMod ? '#ff9ff3' : '#ffeaa7'" style="border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; padding: 15px 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-weight: 900; font-size: 16px; color: #000;">
+      {{ kozossegiMod ? '🌍 A közösség által feltöltött receptek' : '📖 Hivatalos alap receptek' }} ({{ filteredRecipes.length }} db)
+    </span>
+  </div>
+
+  <!-- RÁCS -->
+  <div class="recipe-grid">
+    <div *ngFor="let recipe of paginatedRecipes" style="display: flex; flex-direction: column;">
+      <app-recipe-item [recipe]="recipe" (cardClick)="receptMegnyitasa($event)"></app-recipe-item>
+      <div style="background: #fff; border: 3px solid #000; border-top: none; padding: 8px; text-align: center; font-weight: 900; font-size: 13px; box-shadow: 4px 4px 0 0 #000; margin-bottom: 15px; color: #0056b3;">
+        💬 Kommentek: {{ recipe.hozzaszolasok ? recipe.hozzaszolasok.length : 0 }} db
+      </div>
+    </div>
+  </div>
+
+  <!-- LAPOZÓ -->
+  <div *ngIf="osszesOldal > 1" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 40px; margin-bottom: 20px;">
+    
+    <button class="pagination-btn" (click)="elozoOldal()" [disabled]="jelenlegiOldal === 1">
+      ⬅️ Előző
+    </button>
+    
+    <span style="font-size: 18px; font-weight: 900; border: 4px solid #000; padding: 12px 20px; box-shadow: 5px 5px 0 0 #000; background: #fff;">
+      {{jelenlegiOldal}} / {{osszesOldal}}. oldal
+    </span>
+    
+    <button class="pagination-btn" (click)="kovetkezoOldal()" [disabled]="jelenlegiOldal === osszesOldal">
+      Következő ➡️
+    </button>
+
+  </div>
+
+  <!-- RÉSZLETEK ÉS KOMMENT MODERÁLÁS MODAL -->
+  <div class="modal-overlay" *ngIf="kivalasztottRecept" (click)="kivalasztottRecept = null">
+    <div class="classic-modal" (click)="$event.stopPropagation()">
+      <button class="classic-close-btn" (click)="kivalasztottRecept = null">&times;</button>
+      
+      <img *ngIf="kivalasztottRecept.kepUrl" [src]="kivalasztottRecept.kepUrl" alt="{{kivalasztottRecept.title}}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+
+      <div class="modal-body" style="padding: 35px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+          <div>
+            <h2 style="margin-top: 0; color: #2c3e50; font-weight: bold; font-size: 26px; margin-bottom: 5px;">{{kivalasztottRecept.title}}</h2>
+            <p style="font-size: 15px; margin-top: 0; margin-bottom: 5px; color: #7f8c8d;">
+              <strong>Szerző:</strong> {{ kivalasztottRecept.author ? kivalasztottRecept.author : 'Hivatalos alap recept' }}
+            </p>
+          </div>
+
+          <!-- ADMIN MÓDOSÍTÁS / TÖRLÉS SZEKCIÓ -->
+          <div style="display: flex; gap: 10px;">
+            <button (click)="receptSzerkesztesreMegnyit(kivalasztottRecept)" style="background: #3498db; color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 0 #000; padding: 6px 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
+              ✏️ Módosítás
+            </button>
+
+            <!-- HA MÉG NINCS MEGERŐSÍTÉS ALATT -->
+            <button *ngIf="megerositesAlattId !== kivalasztottRecept.id" 
+                    (click)="torlesiMezoserules(kivalasztottRecept.id)" 
+                    style="background: #ff6b6b; color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 0 #000; padding: 6px 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
+              🗑️ Törlés
+            </button>
+
+            <!-- STÍLUSOS MEGERŐSÍTŐ SÁV -->
+            <div *ngIf="megerositesAlattId === kivalasztottRecept.id" style="display: flex; align-items: center; background: #fff3cd; border: 2px solid #000; padding: 4px 10px; box-shadow: 3px 3px 0 0 #000;">
+              <span style="font-size: 12px; font-weight: 900; margin-right: 10px; color: #000;">Biztosan?</span>
+              <!-- Itt is át van írva ékezet nélkülire a függvény: -->
+              <button (click)="receptTorleseVegleges(kivalasztottRecept)" style="background: #ff6b6b; color: white; border: 2px solid #000; padding: 3px 8px; font-weight: 900; font-size: 12px; cursor: pointer; margin-right: 5px;">Igen</button>
+              <button (click)="megseTorles()" style="background: #ccc; color: black; border: 2px solid #000; padding: 3px 8px; font-weight: 900; font-size: 12px; cursor: pointer;">Mégse</button>
+            </div>
+          </div>
+
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <div *ngIf="kivalasztottRecept.hozzavalok" style="margin-bottom: 25px;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="color: #2c3e50; font-weight: 700; margin: 0; font-size: 20px;">Hozzávalók:</h3>
+            
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" (click)="csokkentAdag()" style="width: 28px; height: 28px; min-width: 28px; min-height: 28px; border-radius: 50%; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; line-height: 1; box-shadow: none; transform: none; outline: none;">
+                <span style="display: flex; align-items: center; justify-content: center; height: 100%; transform: translateY(-2px); font-family: Arial, sans-serif;">−</span>
+              </button>
+              
+              <span style="font-size: 15px; font-weight: 600; color: #334155; min-width: 50px; text-align: center; user-select: none; line-height: 28px; display: inline-block;">
+                {{ aktualisAdag }} adag
+              </span>
+              
+              <button type="button" (click)="novelAdag()" style="width: 28px; height: 28px; min-width: 28px; min-height: 28px; border-radius: 50%; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; margin: 0; line-height: 1; box-shadow: none; transform: none; outline: none;">
+                <span style="display: flex; align-items: center; justify-content: center; height: 100%; transform: translateY(-1px); font-family: Arial, sans-serif;">+</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="background: #f9fbfb; padding: 15px 20px; border: 1px solid #eee;">
+            <div *ngFor="let sor of kivalasztottRecept.hozzavalok.split('\n')" style="margin-bottom: 6px;">
+              
+              <div *ngIf="sor.endsWith(':')" style="font-weight: 700; color: #2c3e50; margin-top: 10px; margin-bottom: 4px; font-size: 15px;">
+                {{ sor }}
+              </div>
+
+              <div *ngIf="!sor.endsWith(':') && sor.trim() !== ''" style="color: #444; font-size: 15px; line-height: 1.5;">
+                • {{ szamoltHozzavalo(sor) }}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <h3 style="color: #2c3e50; font-weight: 700; margin-top: 25px; margin-bottom: 18px; font-size: 20px;">Elkészítés:</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div *ngFor="let lepes of formazottLepesek(kivalasztottRecept.description); let i = index" 
+               style="display: flex; align-items: flex-start; gap: 14px; background: #fafbfc; border: 1px solid #edf2f7; padding: 14px 16px; border-radius: 6px;">
+            
+            <span style="display: flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; color: #2d3748; font-weight: 800; font-size: 14px; line-height: 1; flex-shrink: 0; margin-top: 1px;">
+              {{ i + 1 }}
+            </span>
+
+            <p style="margin: 0; color: #4a5568; line-height: 1.6; font-size: 15px;">
+              {{ lepes }}
+            </p>
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <!-- KOMMENTEK ÉS CSILLAGOS ÉRTÉKELÉSEk MODERÁLÁSA -->
+        <h3 style="color: #2c3e50; font-weight: 600; margin-bottom: 15px;">Hozzászólások és értékelések moderálása</h3>
+
+        <div *ngIf="kivalasztottRecept.hozzaszolasok && kivalasztottRecept.hozzaszolasok.length > 0">
+          <div *ngFor="let h of kivalasztottRecept.hozzaszolasok; let i = index" style="background: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: flex-end; gap: 15px;">
+            
+            <!-- BAL OLDAL: Név, csillagok és a szöveg -->
+            <div style="flex-grow: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong style="color: #2c3e50;">{{ h.felhasznalo }}</strong>
+                
+                <!-- Csillagok a jobb felső részén -->
+                <span *ngIf="h.ertekeles && h.ertekeles > 0" style="color: #f1c40f; font-size: 14px;">
+                  {{ '★'.repeat(h.ertekeles) }}{{ '☆'.repeat(5 - h.ertekeles) }}
+                </span>
+              </div>
+              
+              <!-- Szöveges komment vagy jelzés -->
+              <p *ngIf="h.szoveg && h.szoveg.trim() !== ''" style="margin: 0; color: #555; font-size: 14px; line-height: 1.5;">{{ h.szoveg }}</p>
+              <p *ngIf="(!h.szoveg || h.szoveg.trim() === '') && h.ertekeles > 0" style="margin: 0; color: #aaa; font-size: 13px; font-style: italic;">(Csak csillagos értékelést hagyott)</p>
+            </div>
+
+            <!-- JOBB ALUL: Törlés gomb -->
+            <div>
+              <button (click)="kommentTorlese(i, h)" 
+                      style="background: #ff6b6b; color: white; border: 2px solid #000; padding: 5px 12px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 2px 2px 0 0 #000; white-space: nowrap;">
+                🗑️ Törlés
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div *ngIf="!kivalasztottRecept.hozzaszolasok || kivalasztottRecept.hozzaszolasok.length === 0" style="text-align: center; padding: 20px; background: #f9fbfb;">
+          <p style="margin: 0; color: #888; font-style: italic;">Ehhez a recepthez még nincsenek hozzászólások vagy értékelések.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

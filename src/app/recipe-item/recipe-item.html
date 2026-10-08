@@ -6,8 +6,8 @@
          style="width: 100%; height: 180px; object-fit: cover; border-radius: 20px 20px 0 0; display: block;" 
          alt="Recept képe">
          
-    <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-      👤 {{recipe.author || 'Ismeretlen'}}
+   <div *ngIf="recipe.author" style="position: absolute; bottom: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #333;">
+      👤 {{ recipe.author }}
     </div>
 
   </div>

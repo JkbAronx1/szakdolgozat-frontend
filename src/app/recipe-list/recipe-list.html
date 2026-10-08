@@ -1,32 +1,19 @@
 <div class="container">
 
   <!--SZEZON TESZTELŐ-->
-
   <div style="background: #2d3436; color: #fff; padding: 10px 16px; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-    <span style="font-weight: 900; font-size: 13px; text-transform: uppercase; color: #ffeaa7;">
-     Évszak tesztelő:
-    </span>
-    
+    <span style="font-weight: 900; font-size: 13px; text-transform: uppercase; color: #ffeaa7;"></span>
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-      <button (click)="tesztEvszakValtas(3)" style="background: #55efc4; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">
-        🌱 Tavasz
-      </button>
-      <button (click)="tesztEvszakValtas(6)" style="background: #ffeaa7; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">
-        ☀️ Nyár
-      </button>
-      <button (click)="tesztEvszakValtas(9)" style="background: #fab1a0; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">
-        🍂 Ősz
-      </button>
-      <button (click)="tesztEvszakValtas(0)" style="background: #74b9ff; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">
-        ❄️ Tél
-      </button>
-      <button (click)="meghatarozEvszakot(); szezonMod = false" style="background: #fff; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">
-        🔄 Alap naptár
-      </button>
+      <button (click)="tesztEvszakValtas(3)" style="background: #55efc4; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">🌱 Tavasz</button>
+      <button (click)="tesztEvszakValtas(6)" style="background: #ffeaa7; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">☀️ Nyár</button>
+      <button (click)="tesztEvszakValtas(9)" style="background: #fab1a0; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">🍂 Ősz</button>
+      <button (click)="tesztEvszakValtas(0)" style="background: #74b9ff; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">❄️ Tél</button>
+      <button (click)="meghatarozEvszakot(); szezonMod = false" style="background: #fff; border: 2px solid #000; font-weight: bold; cursor: pointer; padding: 5px 10px; box-shadow: 2px 2px 0 0 #000;">🔄 Alap naptár</button>
     </div>
   </div>
 
-  <div *ngIf="toastUzenet" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; background: #ff6b6b; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
+  <!-- JOBB FELSŐ SAROKBAN FELUGRÓ ÉRTESÍTÉS -->
+  <div *ngIf="toastUzenet" [style.background]="toastUzenet.toLowerCase().includes('sikeres') ? '#2ecc71' : '#ff6b6b'" style="position: fixed; top: 20px; right: 20px; z-index: 9999; color: white; padding: 15px 25px; font-weight: 900; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; font-family: inherit; font-size: 16px;">
     {{ toastUzenet }}
   </div>
 
@@ -47,7 +34,15 @@
             [style.background]="sajatReceptekMod ? '#ffd32a' : '#fff'" 
             style="color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" 
             (click)="toggleSajatReceptek()">
-      📖 {{ sajatReceptekMod ? 'Összes recept' : 'Saját receptjeim' }}
+      📖 {{ sajatReceptekMod ? 'Alap receptek' : 'Saját receptjeim' }}
+    </button>
+
+    <!-- KÖZÖSSÉGI RECEPTEK GOMB -->
+    <button class="header-action-btn" 
+            [style.background]="kozossegiMod ? '#ff9ff3' : '#fff'" 
+            style="color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" 
+            (click)="toggleKozossegiMod()">
+      🌍 {{ kozossegiMod ? 'Alap receptek' : 'Közösségi receptek' }}
     </button>
 
     <!-- SZEZONÁLIS AJÁNLAT GOMB -->
@@ -55,12 +50,12 @@
             [style.background]="szezonMod ? aktualisEvszak.szin : '#a29bfe'" 
             style="color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" 
             (click)="toggleSzezonMod()">
-      {{ aktualisEvszak.emoji }} {{ szezonMod ? 'Összes recept' : (aktualisEvszak.nev + 'i fogások') }}
+      {{ aktualisEvszak.emoji }} {{ szezonMod ? 'Alap receptek' : (aktualisEvszak.nev + 'i fogások') }}
     </button>
 
     <!-- MIT EGYEK MA? GOMB -->
     <button class="header-action-btn" style="background: #a29bfe; color: #000; font-weight: 900; border: 3px solid #000; box-shadow: 4px 4px 0 0 #000; cursor: pointer;" (click)="toggleVeletlenMod()">
-      🎲 {{ veletlenMod ? 'Összes recept' : 'Mit egyek ma?' }}
+      🎲 {{ veletlenMod ? 'Alap receptek' : 'Mit egyek ma?' }}
     </button>
 
     <!-- SZŰRÉS GOMB -->
@@ -80,16 +75,27 @@
 
   <div class="filter-panel" [class.show]="szuroNyitva">
     <h3 style="margin-top: 0; font-weight: 900; text-transform: uppercase;">🔍 Receptek szűrése</h3>
+    
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end;">
       
       <div class="filter-box" style="display: flex; flex-direction: column;">
         <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kategória szerint</label>
         <select [(ngModel)]="szuroKategoria" (change)="veletlenMod = false" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
           <option value="">Összes kategória</option>
-          <option value="Főétel">Főétel</option>
-          <option value="Desszert">Desszert</option>
+          <option value="Reggeli">Reggeli</option>
+          <option value="Tízórai / Uzsonna">Tízórai / Uzsonna</option>
           <option value="Előétel">Előétel</option>
           <option value="Leves">Leves</option>
+          <option value="Főétel">Főétel</option>
+          <option value="Street food">Street food</option>
+          <option value="Tészta">Tészta</option>
+          <option value="Köret">Köret</option>
+          <option value="Saláta">Saláta</option>
+          <option value="Desszert">Desszert</option>
+          <option value="Péksütemény">Péksütemény (Kenyér, Kifli)</option>
+          <option value="Snack / Rágcsálnivaló">Snack / Rágcsálnivaló</option>
+          <option value="Ital / Turmix">Ital / Turmix</option>
+          <option value="Szósz / Mártás">Szósz / Mártás</option>
         </select>
       </div>
 
@@ -108,7 +114,30 @@
         <input type="number" [(ngModel)]="szuroIdo" (input)="veletlenMod = false" placeholder="Pl.: 45" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
       </div>
 
-      <div class="filter-box">
+      <!-- ÚJ: RENDEZÉS -->
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Rendezés alapja</label>
+        <select [(ngModel)]="kivalasztottRendezes" (change)="veletlenMod = false" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+          <option value="legujabb">Legújabbak elöl</option>
+          <option value="ido_asc">Idő (gyorsak elöl)</option>
+          <option value="ido_desc">Idő (lassúak elöl)</option>
+        </select>
+      </div>
+
+      <!-- ÚJ: KÖTELEZŐ -->
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kötelező hozzávaló</label>
+        <input type="text" [(ngModel)]="kotelezoText" (input)="veletlenMod = false" placeholder="Pl.: paradicsom" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <!-- ÚJ: KIZÁRANDÓ -->
+      <div class="filter-box" style="display: flex; flex-direction: column;">
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Mit NE tartalmazzon?</label>
+        <input type="text" [(ngModel)]="kizarandoText" (input)="veletlenMod = false" placeholder="Pl.: gomba" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
+      </div>
+
+      <!-- SZŰRŐK TÖRLÉSE (Szétnyújtva 2 oszloposra, hogy kitöltse a rácsot) -->
+      <div class="filter-box" style="grid-column: span 2;">
         <button class="header-action-btn" style="width: 100%; justify-content: center; background: #fff; border: 3px solid #000; padding: 11px 15px; box-shadow: 4px 4px 0 0 #000; font-weight: 900; cursor: pointer;" (click)="szurokTollese()">🗑️ Szűrők törlése</button>
       </div>
 
@@ -130,10 +159,20 @@
       <div style="display: flex; flex-direction: column;">
         <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Kategória</label>
         <select [(ngModel)]="ujReceptAdatok.kategoria" style="width: 100%; box-sizing: border-box; border: 3px solid #000; padding: 10px; background: #fff; font-weight: bold;">
-          <option value="Főétel">Főétel</option>
-          <option value="Desszert">Desszert</option>
+          <option value="Reggeli">Reggeli</option>
+          <option value="Tízórai / Uzsonna">Tízórai / Uzsonna</option>
           <option value="Előétel">Előétel</option>
           <option value="Leves">Leves</option>
+          <option value="Főétel">Főétel</option>
+          <option value="Street food">Street food</option>
+          <option value="Tészta">Tészta</option>
+          <option value="Köret">Köret</option>
+          <option value="Saláta">Saláta</option>
+          <option value="Desszert">Desszert</option>
+          <option value="Péksütemény">Péksütemény (Kenyér, Kifli)</option>
+          <option value="Snack / Rágcsálnivaló">Snack / Rágcsálnivaló</option>
+          <option value="Ital / Turmix">Ital / Turmix</option>
+          <option value="Szósz / Mártás">Szósz / Mártás</option>
         </select>
       </div>
 
@@ -172,7 +211,7 @@
       </div>
 
       <div style="display: flex; flex-direction: column; grid-column: 1 / -1; margin-top: 10px;">
-        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Hozzávalók (Írj számot az elejére, pl: 40 dkg liszt, 2 db tojás)</label>
+        <label style="font-weight: 900; font-size: 12px; margin-bottom: 5px; text-transform: uppercase;">Hozzávalók</label>
         <textarea [(ngModel)]="ujReceptAdatok.hozzavalok" 
                   rows="5" 
                   placeholder="Írd le a hozzávalókat..." 
@@ -194,18 +233,29 @@
     </button>
   </div>
 
+  <!-- SAJÁT RECEPTEK PANEL -->
   <div *ngIf="sajatReceptekMod" style="background: #ffeaa7; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; padding: 15px 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
     <span style="font-weight: 900; font-size: 16px; color: #000;">
       📖 Saját receptjeid listája ({{ filteredRecipes.length }} db általad feltöltött recept)
     </span>
     <button (click)="toggleSajatReceptek()" style="background: #fff; border: 3px solid #000; padding: 8px 15px; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0 0 #000;">
-      ✕ Vissza az összes recepthez
+      ✕ Vissza az alap receptekhez
+    </button>
+  </div>
+
+  <!-- KÖZÖSSÉGI RECEPTEK PANEL -->
+  <div *ngIf="kozossegiMod" style="background: #ff9ff3; border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; padding: 15px 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-weight: 900; font-size: 16px; color: #000;">
+      🌍 A közösség által feltöltött receptek ({{ filteredRecipes.length }} db megosztott recept)
+    </span>
+    <button (click)="toggleKozossegiMod()" style="background: #fff; border: 3px solid #000; padding: 8px 15px; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0 0 #000;">
+      ✕ Vissza az alap receptekhez
     </button>
   </div>
 
   <div *ngIf="szezonMod" [style.background]="aktualisEvszak.szin" style="border: 4px solid #000; box-shadow: 5px 5px 0 0 #000; padding: 15px 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
     <span style="font-weight: 900; font-size: 16px; color: #000;">
-      {{ aktualisEvszak.emoji }} Friss, szezonális {{ aktualisEvszak.nev.toLowerCase() }}i receptek ({{ filteredRecipes.length }} recept található)
+      {{ aktualisEvszak.emoji }} Szezonális {{ aktualisEvszak.nev.toLowerCase() }}i receptek ({{ filteredRecipes.length }} recept található)
     </span>
     <button (click)="toggleSzezonMod()" style="background: #fff; border: 3px solid #000; padding: 8px 15px; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0 0 #000;">
       ✕ Bezárás
@@ -249,16 +299,31 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
           <div>
             <h2 style="margin-top: 0; color: #2c3e50; font-weight: bold; font-size: 26px; margin-bottom: 5px;">{{kivalasztottRecept.title}}</h2>
-            <p style="font-size: 15px; margin-top: 0; margin-bottom: 5px; color: #7f8c8d;"><strong>Szerző:</strong> {{kivalasztottRecept.author}}</p>
+            <!-- SZERZŐ / HIVATALOS RECEPT KIÍRÁSA A RÉSZLETEK ABLAKBAN IS -->
+            <p style="font-size: 15px; margin-top: 0; margin-bottom: 5px; color: #7f8c8d;">
+              <strong>Szerző:</strong> {{ kivalasztottRecept.author ? kivalasztottRecept.author : 'Hivatalos alap recept' }}
+            </p>
           </div>
 
+          <!-- MÓDOSÍTÁS / TÖRLÉS SZEKCIÓ -->
           <div *ngIf="bejelentkezve && kivalasztottRecept.author && kivalasztottRecept.author.toLowerCase() === bejelentkezettFelhasznaloNev.toLowerCase()" style="display: flex; gap: 10px;">
             <button (click)="receptSzerkesztesreMegnyit(kivalasztottRecept)" style="background: #3498db; color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 0 #000; padding: 6px 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
               ✏️ Módosítás
             </button>
-            <button (click)="receptTorles(kivalasztottRecept)" style="background: #ff6b6b; color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 0 #000; padding: 6px 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
+            
+            <!-- HA MÉG NINCS MEGERŐSÍTÉS ALATT -->
+            <button *ngIf="megerositesAlattId !== kivalasztottRecept.id" 
+                    (click)="torlesiMezoserules(kivalasztottRecept.id)" 
+                    style="background: #ff6b6b; color: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 0 #000; padding: 6px 12px; font-weight: 800; font-size: 13px; cursor: pointer;">
               🗑️ Törlés
             </button>
+
+            <!-- STÍLUSOS MEGERŐSÍTŐ SÁV -->
+            <div *ngIf="megerositesAlattId === kivalasztottRecept.id" style="display: flex; align-items: center; background: #fff3cd; border: 2px solid #000; padding: 4px 10px; box-shadow: 3px 3px 0 0 #000;">
+              <span style="font-size: 12px; font-weight: 900; margin-right: 10px; color: #000;">Biztosan?</span>
+              <button (click)="receptTorleseVegleges(kivalasztottRecept)" style="background: #ff6b6b; color: white; border: 2px solid #000; padding: 3px 8px; font-weight: 900; font-size: 12px; cursor: pointer; margin-right: 5px;">Igen</button>
+              <button (click)="megseTorles()" style="background: #ccc; color: black; border: 2px solid #000; padding: 3px 8px; font-weight: 900; font-size: 12px; cursor: pointer;">Mégse</button>
+            </div>
           </div>
         </div>
         
