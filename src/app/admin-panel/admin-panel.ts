@@ -29,10 +29,9 @@ export class AdminPanelComponent implements OnInit {
   receptekOldalankent: number = 21;
 
   ujReceptAdatok = {
-    title: '', description: '', author: 'Hivatalos alap recept', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: '', adag: 4
+    title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: '', adag: 4
   };
 
-  // Jelezzük, hogy melyik receptnél megy a törlés megerősítése
   megerositesAlattId: number | null = null;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
@@ -54,11 +53,9 @@ export class AdminPanelComponent implements OnInit {
       .subscribe({
         next: (adatok) => {
           this.recipesWithComments = (adatok || []).map(item => {
-            // Biztosítjuk, hogy a név és a csillagos értékelés is helyesen átjöjjön a szerverről
             item.kommentek = (item.kommentek || []).map((k: any) => ({
               ...k,
               felhasznalo: k.felhasznalo || k.author || k.username || 'Vendég',
-              // Itt ellenőrizzük az összes lehetséges mezőnevet, amin a backend küldheti az értékelést
               ertekeles: k.ertekeles !== undefined ? k.ertekeles : (k.rating !== undefined ? k.rating : (k.csillag !== undefined ? k.csillag : 0))
             }));
             return item;
@@ -91,7 +88,7 @@ export class AdminPanelComponent implements OnInit {
     this.szerkesztesMod = false;
     this.szerkesztettReceptId = null;
     this.ujReceptAdatok = {
-      title: '', description: '', author: 'Hivatalos alap recept', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: '', adag: 4
+      title: '', description: '', author: '', ido: 0, nehezseg: 'Könnyű', kategoria: 'Főétel', kepUrl: '', ingredients: '', hozzavalok: '', adag: 4
     };
   }
 
@@ -102,7 +99,7 @@ export class AdminPanelComponent implements OnInit {
     this.ujReceptAdatok = {
       title: recept.title || '',
       description: recept.description || '',
-      author: recept.author || 'Hivatalos alap recept',
+      author: recept.author || '',
       ido: recept.ido || 0,
       nehezseg: recept.nehezseg || 'Könnyű',
       kategoria: recept.kategoria || 'Főétel',

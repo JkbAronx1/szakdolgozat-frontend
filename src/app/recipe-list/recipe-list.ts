@@ -96,7 +96,7 @@ export class RecipeListComponent implements OnInit {
   onEscapePress() {
     if (this.kivalasztottRecept) {
       this.kivalasztottRecept = null;
-      this.megerositesAlattId = null; // Záráskor elvetjük a törlési szándékot is
+      this.megerositesAlattId = null;
     } else if (this.bejelentkezoAblakNyitva) {
       this.bejelentkezoAblakNyitva = false;
     } else if (this.regisztraciosAblakNyitva) {
@@ -207,7 +207,7 @@ export class RecipeListComponent implements OnInit {
     this.kivalasztottRecept = recept;
     this.alapAdag = recept.adag && recept.adag > 0 ? recept.adag : 4;
     this.aktualisAdag = this.alapAdag;
-    this.megerositesAlattId = null; // Zárjuk le, ha esetleg nyitva maradt volna korábbról
+    this.megerositesAlattId = null;
   }
 
   novelAdag() {
@@ -442,7 +442,7 @@ export class RecipeListComponent implements OnInit {
     this.bejelentkezoAblakNyitva = true;
   }
 
-  regisztracio() {
+ regisztracio() {
     if (this.regAdatok.username && this.regAdatok.email && this.regAdatok.jelszo && this.regAdatok.jelszoUjra) {
       const email = this.regAdatok.email.trim().toLowerCase();
 
@@ -458,6 +458,14 @@ export class RecipeListComponent implements OnInit {
         return;
       }
 
+      const gyakoriElgepelesek = ['gmal.com', 'gamil.com', 'freemal.hu', 'citromal.hu'];
+      const domain = email.split('@')[1];
+      if (domain && gyakoriElgepelesek.includes(domain)) {
+        this.toastUzenet = `Úgy tűnik, elgépelted az e-mail címet (${domain})!`;
+        this.hibaIdozito();
+        return;
+      }
+    
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(email)) {
         this.toastUzenet = 'Hibás e-mail cím formátum!';
@@ -486,8 +494,12 @@ export class RecipeListComponent implements OnInit {
             this.toastUzenet = valasz || 'Sikeres regisztráció!';
             this.hibaIdozito();
           },
-          error: () => { 
-            this.toastUzenet = 'Hiba történt a regisztráció során!'; 
+          error: (err) => { 
+            if (err.error && typeof err.error === 'string') {
+              this.toastUzenet = err.error;
+            } else {
+              this.toastUzenet = 'Hiba történt a regisztráció során!'; 
+            }
             this.hibaIdozito();
           }
         });
@@ -572,7 +584,6 @@ export class RecipeListComponent implements OnInit {
   }
 
   receptMentes() {
-    // Kijavított mentési logika: Ha nincs bejelentkezve, ne küldjön "Ismeretlen"-t.
     this.ujReceptAdatok.author = this.bejelentkezettFelhasznaloNev || '';
 
     if (this.szerkesztesMod && this.szerkesztettReceptId) {
@@ -628,10 +639,10 @@ export class RecipeListComponent implements OnInit {
     }
 
     const szinonimak = [
-      ['marha', 'marhahús', 'marhahus', 'darált marha', 'marhalábszár'],
+      ['marha', 'marhahús', 'darált marha', 'hátszín', 'darált marhahús'],
       ['csirke', 'csirkemell', 'csirkecomb', 'csirkehús', 'csirkeszárny'],
-      ['sertés', 'sertéshús', 'karaj', 'tarja', 'disznó', 'malac'],
-      ['krumpli', 'burgonya', 'édesburgonya']
+      ['sertés', 'sertéshús', 'karaj', 'tarja', 'disznó', 'malac', 'darált sertéshús'],
+      ['krumpli', 'burgonya']
     ];
 
     const szoSzerepel = (szovegToKeres: string, keresoKifejezes: string): boolean => {

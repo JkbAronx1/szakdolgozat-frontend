@@ -458,13 +458,13 @@
           <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label>
           <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
             <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="loginAdatok.jelszo" (keyup.enter)="belepes()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
-            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
           </div>
         </div>
 
         <button style="width: 100%; margin-top: 10px; background: #4ecdc4;" (click)="belepes()">Belépés</button>
         <div style="text-align: center; margin-top: 20px; border-top: 4px solid #000; padding-top: 20px;">
-          <p style="font-weight: 900; margin: 0 0 10px 0;">Már van fiókod?</p>
+          <p style="font-weight: 900; margin: 0 0 10px 0;">Nincsen még fiókod?</p>
           <button style="background: #fff; width: 100%; box-shadow: 4px 4px 0 0 #000;" (click)="megnyitRegisztracio()">Regisztrálj egyet!</button>
         </div>
       </div>
@@ -498,7 +498,7 @@
           <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó</label>
           <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
             <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="regAdatok.jelszo" (keyup.enter)="regisztracio()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
-            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
           </div>
         </div>
         
@@ -506,7 +506,7 @@
           <label style="display: block; margin-bottom: 5px; font-weight: 900; text-transform: uppercase;">Jelszó megerősítése</label>
           <div style="border: 4px solid #000; background: #fff; display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
             <input [type]="jelszoLathato ? 'text' : 'password'" [(ngModel)]="regAdatok.jelszoUjra" (keyup.enter)="regisztracio()" style="flex: 1; border: none; outline: none; background: transparent; padding: 10px; padding-right: 40px; font-family: inherit; font-size: 15px; box-sizing: border-box;">
-            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye-slash' : 'fa-eye'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
+            <i class="fa-solid" [ngClass]="jelszoLathato ? 'fa-eye' : 'fa-eye-slash'" (click)="toggleJelszoMutatasa()" style="position: absolute; right: 12px; cursor: pointer; font-size: 16px; color: #333;"></i>
           </div>
         </div>
 
